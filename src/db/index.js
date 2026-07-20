@@ -9,6 +9,7 @@ const connectDB = async ()=>{
         
     }catch(err){
         console.log("Error in Connecting DataBase :"+err)
+        process.exit(1)
     }
 }
 
