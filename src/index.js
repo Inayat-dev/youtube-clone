@@ -9,6 +9,7 @@ connectDB()
 
 app.get("/",(req,res)=>{
     res.json({data:"api is running"})
+
 })
 
 app.listen(4500,()=>{
