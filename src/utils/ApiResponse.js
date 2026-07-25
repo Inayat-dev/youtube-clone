@@ -10,3 +10,5 @@ class ApiResponse{
         this.success = status < 404
     }
 }
+
+export default ApiResponse
