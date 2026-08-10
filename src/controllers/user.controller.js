@@ -58,4 +58,55 @@ const registerUser = asyncHandler(async function (req, res) {
         .json(new ApiResponse(201, safeUser, "user registered successfully"))
 })
 
-export { registerUser }
+async function generateAccessAndRefreshToken(ID){
+
+    const userData = await User.findById(ID);
+    const accessToken = userData.generateAccessTokens();
+    const refreshToken = userData.generateRefreshTokens();
+    //save Refresh Token in database
+    userData.refreshToken = refreshToken
+    userData.save({validateBeforeSave: false})
+
+    return {accessToken, refreshToken}
+
+}
+
+const loginUser = asyncHandler(async function (req,res){
+
+    
+    const { email,username,password } = req.body;
+
+    //validation
+    if(!username && !email){
+        throw new ApiError(500,"Required all fields");
+    }
+
+    const user = await User.findOne({ $or: [{username},{email}]});
+
+    if(!user){
+        throw new ApiError(404,"User does not exist")
+    }
+
+    const isPassCorrect = await user.isPasswordCorrect(password);
+
+    if(!isPassCorrect){
+        throw new ApiError(404,"Password is not currect")
+    }
+
+    //generate Access Token and Refresh token
+    const {accessToken, refreshToken} = await generateAccessAndRefreshToken(user._id)
+
+
+
+    const LoggedinUser =  await User.findById(user._id).select(
+        "-password -refreshToken"
+    )
+
+    //save in cookie
+    res
+    .status(200)
+    .cookie("accessToken",accessToken)
+    .json(new ApiResponse(201,LoggedinUser,"User Loggedin Successfully"))
+})
+
+export { registerUser, loginUser }
