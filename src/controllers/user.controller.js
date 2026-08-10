@@ -73,7 +73,6 @@ async function generateAccessAndRefreshToken(ID){
 
 const loginUser = asyncHandler(async function (req,res){
 
-    
     const { email,username,password } = req.body;
 
     //validation
@@ -109,4 +108,21 @@ const loginUser = asyncHandler(async function (req,res){
     .json(new ApiResponse(201,LoggedinUser,"User Loggedin Successfully"))
 })
 
-export { registerUser, loginUser }
+const logoutUser = asyncHandler(async function(req,res){
+    const user = req.user
+
+    await User.findByIdAndUpdate(
+        user._id,
+        {
+            refreshToken : undefined
+        },
+        {
+            new: true
+        }
+    )
+
+    res.status(200).clearCookie("accessToken").json(new ApiResponse(200,{logout: true},"user logout successfully"))
+
+})
+
+export { registerUser, loginUser, logoutUser }
