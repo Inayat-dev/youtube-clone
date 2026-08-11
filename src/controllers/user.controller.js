@@ -151,4 +151,33 @@ const AccessRefreshToken = asyncHandler(async function(req,res){
             .json(new ApiResponse(200,{accessToken, refreshToken}))
 })
 
-export { registerUser, loginUser, logoutUser, AccessRefreshToken }
+const updatePassword = asyncHandler(async (req,res)=>{
+    const {oldPassword, newPassword} = req.body;
+    const user = await User.findById(req.user._id);
+    const isPasswordCorrect = await user.isPasswordCorrect(oldPassword)
+
+    if(!oldPassword && !newPassword){
+        throw new ApiError(404,"Required Old and New Password")
+    }
+
+    if(!isPasswordCorrect){
+        throw new ApiError(404,"old Password is incorrect")
+    }
+
+    user.password = newPassword
+    user.save({validateBeforeSave: false})
+
+
+    return res
+            .status(200)
+            .json(new ApiResponse(200,{},"password updated successfully"))
+
+})
+
+export { 
+    registerUser, 
+    loginUser, 
+    logoutUser, 
+    AccessRefreshToken,
+    updatePassword,
+}
