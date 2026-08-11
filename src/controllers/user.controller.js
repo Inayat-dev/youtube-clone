@@ -207,6 +207,49 @@ const updateDetails = asyncHandler(async (req,res)=>{
 
 })
 
+const updateAvatar = asyncHandler(async (req,res, next)=>{
+    try {
+        if(!req.files.avatar[0]){
+            throw new ApiError(200,"file not found")
+        }
+    
+        const uploadFile = await uploadFileOnCloudinary(req.files.avatar[0].path)
+    
+        const user = await User.findById(req.user._id)
+
+        user.avatarImg = uploadFile.url;
+        user.save({validateBeforeSave: false})
+
+        return res
+                .status(200)
+                .json(new ApiResponse(200,{url:uploadFile.url},"successfully uploaded"))
+        
+    } catch (error) {
+        throw new ApiError(500, error.message)
+    }
+})
+
+const updateBanner = asyncHandler(async (req,res, next)=>{
+    try {
+        if(!req.files.banner[0]){
+            throw new ApiError(200,"file not found")
+        }
+    
+        const uploadFile = await uploadFileOnCloudinary(req.files.banner[0].path)
+    
+        const user = await User.findById(req.user._id)
+
+        user.banner = uploadFile.url;
+        user.save({validateBeforeSave: false})
+
+        return res
+                .status(200)
+                .json(new ApiResponse(200,{url:uploadFile.url},"successfully uploaded"))
+        
+    } catch (error) {
+        throw new ApiError(500, error.message)
+    }
+})
 
 export { 
     registerUser, 
@@ -216,4 +259,6 @@ export {
     updatePassword,
     updateDetails,
     getUser,
+    updateAvatar,
+    updateBanner,
 }
