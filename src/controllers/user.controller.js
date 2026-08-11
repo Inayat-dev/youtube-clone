@@ -183,8 +183,29 @@ const getUser = asyncHandler(async (req,res)=>{
             .json(new ApiResponse(200,user,"User Detail"))
 })
 
+const updateDetails = asyncHandler(async (req,res)=>{
+    const { email, fullName } = req.body;
+    const user = await User.findById(req.user._id)
+
+    if(!fullName && !email){
+        throw new ApiError(404, "field are required")
+    }
+
+    if(fullName){
+        user.fullName = fullName
+    }
+    if(email){
+        user.email = email
+    }
+
+    user.save()
+
+    return res
+            .status(200)
+            .json(new ApiResponse(200,{updated: true},"Detail Chnaged Successfully"))
 
 
+})
 
 
 export { 
@@ -193,5 +214,6 @@ export {
     logoutUser, 
     AccessRefreshToken,
     updatePassword,
+    updateDetails,
     getUser,
 }
