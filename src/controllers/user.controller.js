@@ -285,17 +285,30 @@ const getChannel = asyncHandler(async (req,res)=>{
         },
 
         {
-            $addFields:{
-                "subscribed": {$size: "$subscribed"},
-                "subscribers": {$size: "$subscribers"},
+            $addFields: {
+                subscribersCount: { $size: "$subscribers" },
+                channelsSubscribedToCount: { $size: "$subscribed" },
+                isSubscribed: {
+                    $cond: {
+                        if: { $in: [req.user._id, "$subscribers.subscriber"] },
+                        then: true,
+                        else: false
+                    }
+                }
             }
         },
 
         {
             $project:{
-                _id:0,
-                subscribed: 1,
-                subscribers: 1
+                _id:1,
+                username: 1,
+                email:1,
+                fullName:1,
+                avatar: 1,
+                coverImage:1,
+                subscribersCount: 1,
+                channelsSubscribedToCount: 1,
+                isSubscribed: 1
             }
         }
     ])

@@ -17,7 +17,7 @@ router.route("/logout").post(verifyJWT, logoutUser)
 
 router.route("/refresh-token").post(AccessRefreshToken)
 
-router.route("/channel/:username").post(getChannel)
+router.route("/channel/:username").post(verifyJWT, getChannel)
 
 router.route("/update-password").post(verifyJWT, updatePassword)
 
