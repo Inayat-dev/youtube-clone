@@ -4,6 +4,7 @@ import { uploadFileOnCloudinary } from "../utils/cloudinary.js"
 import ApiResponse from "../utils/ApiResponse.js"
 import { User } from "../models/user.model.js"
 import jwt, { decode } from "jsonwebtoken"
+import { subscribe } from "diagnostics_channel"
 
 const registerUser = asyncHandler(async function (req, res) {
     const { email, username, password, fullName } = req.body
@@ -251,6 +252,59 @@ const updateBanner = asyncHandler(async (req,res, next)=>{
     }
 })
 
+const getChannel = asyncHandler(async (req,res)=>{
+    const {username} = req.params;
+
+    if(!username){
+        throw new ApiError(404,"required channel Name")
+    }
+
+    const data = await User.aggregate([
+        {
+            $match:{
+                username
+            }
+        },
+
+        {
+            $lookup:{
+                from: "subscription",
+                localField:"_id",
+                foreignField: "channel",
+                as:"subscribers"
+            }
+        },
+
+        {
+            $lookup:{
+                from: "subscription",
+                localField:"_id",
+                foreignField: "subscribers",
+                as:"subscribed"
+            }
+        },
+
+        {
+            $addFields:{
+                "subscribed": {$size: "$subscribed"},
+                "subscribers": {$size: "$subscribers"},
+            }
+        },
+
+        {
+            $project:{
+                _id:0,
+                subscribed: 1,
+                subscribers: 1
+            }
+        }
+    ])
+
+    return res
+    .status(200)
+    .json(new ApiResponse(200,data,"success"))
+})
+
 export { 
     registerUser, 
     loginUser, 
@@ -261,4 +315,5 @@ export {
     getUser,
     updateAvatar,
     updateBanner,
+    getChannel,
 }
