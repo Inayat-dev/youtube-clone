@@ -318,6 +318,10 @@ const getChannel = asyncHandler(async (req,res)=>{
     .json(new ApiResponse(200,data,"success"))
 })
 
+const getWatchHistory = asyncHandler(async (req,res)=>{
+    
+})
+
 export { 
     registerUser, 
     loginUser, 
