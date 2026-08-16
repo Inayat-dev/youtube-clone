@@ -5,6 +5,7 @@ import ApiResponse from "../utils/ApiResponse.js"
 import { User } from "../models/user.model.js"
 import jwt, { decode } from "jsonwebtoken"
 import { subscribe } from "diagnostics_channel"
+import mongoose from "mongoose"
 
 const registerUser = asyncHandler(async function (req, res) {
     const { email, username, password, fullName } = req.body
@@ -319,7 +320,42 @@ const getChannel = asyncHandler(async (req,res)=>{
 })
 
 const getWatchHistory = asyncHandler(async (req,res)=>{
-    
+    const data = await User.aggregate([
+        {
+            $match: {
+                _id :new mongoose.Types.ObjectId(req.user._id)
+            }
+        },
+        {
+            $lookup:{
+                from:"videos",
+                localField:"watchHistory",
+                foreignField:"_id",
+                as:"watchHistory",
+                pipeline:[
+                    {
+                        $lookup:{
+                            from:"users",
+                            localField:"owner",
+                            foreignField:"_id",
+                            as:"owner"
+                        }
+                    }
+                ]
+            }
+        },
+
+        {
+            $project:{
+                _id:1,
+                watchHistory:1
+            }
+        }
+    ])
+
+    return res
+        .status(200)
+        .json(new ApiResponse(200,data,"watch history"))
 })
 
 export { 
@@ -333,4 +369,5 @@ export {
     updateAvatar,
     updateBanner,
     getChannel,
+    getWatchHistory,
 }

@@ -1,7 +1,20 @@
 import { Router } from "express";
-import { registerUser, loginUser, logoutUser, AccessRefreshToken, updatePassword, updateDetails, getUser, updateAvatar, updateBanner, getChannel } from "../controllers/user.controller.js";
+import { 
+    registerUser,
+    loginUser, 
+    logoutUser, 
+    AccessRefreshToken, 
+    updatePassword, 
+    updateDetails, 
+    getUser, 
+    updateAvatar, 
+    updateBanner, 
+    getChannel,
+    getWatchHistory
+} from "../controllers/user.controller.js";
 import {upload} from "../middleware/multer.middleware.js"
 import { verifyJWT } from "../middleware/auth.middleware.js";
+import mongoose from "mongoose";
 
 const router = Router()
 
@@ -41,5 +54,7 @@ router.route("/update-banner").post(
 
 
 router.route("/profile").post(verifyJWT, getUser)
+router.route("/watch-history").post(verifyJWT, getWatchHistory)
+
 
 export default router
