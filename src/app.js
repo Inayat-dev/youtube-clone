@@ -2,6 +2,7 @@ import express from "express";
 import cors from "cors"
 import cookieParser from "cookie-parser";
 
+
 const app = express()
 
 app.use(cors({
@@ -15,8 +16,12 @@ app.use(cookieParser())
 
 //import route
 import userRoute from "./route/user.router.js"
+import healthRoute from "./route/healthcheck.router.js"
+import tweetRouter from "./route/tweet.router.js"
 
 //routes
 app.use("/users",userRoute)
+app.use("/healthcheck",healthRoute)
+app.use("/tweet",tweetRouter)
 
 export default app

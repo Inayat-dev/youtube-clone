@@ -37,7 +37,7 @@ const registerUser = asyncHandler(async function (req, res) {
 
     if (!avatarImg) {
         throw new ApiError(500, "avatar upload failed, please try again")
-    }
+    } 
 
     const createdUser = await User.create({
         email,
