@@ -69,11 +69,69 @@ const getUserTweets = asyncHandler(async (req,res)=>{
     return res  
         .status(200)
         .json(new ApiResponse(200,tweets))
+})
 
+const updateTweet = asyncHandler(async (req,res)=>{
+    //get user and new content
+    //get tweet id
+    //check user and tweet exist
+    //update tweet 
+    //send new tweet
+
+    const {content, tweetId} = req.body
+
+    if(!content || !tweetId){
+        throw new ApiError(404,"required id and content")
+    }
+
+    const user = await User.findById(req.user._id)
+    const tweet = await Tweet.findById(tweetId)
+    console.log(tweet.owner,user._id)
+
+    if(user._id.toString() !== tweet.owner.toString()){
+        throw new ApiError(404,"ID not match")
+    }
+
+    const newTweet = await Tweet.findByIdAndUpdate(tweetId,{content},{new:true})
+
+    if(!newTweet){
+        throw new ApiError(500,"tweet not updated")
+    }
+
+    return res
+        .status(200)
+        .json(new ApiResponse(200,newTweet,"success"))
+})
+
+const deletTweet = asyncHandler(async (req,res)=>{
+    const { tweetId } = req.body
+
+    if(!tweetId){
+        throw new ApiError(404,"invalid tweet id")
+    }
+
+    const tweet = await Tweet.findById(tweetId)
+
+    if(!tweet){
+        throw new ApiError(404,"tweet does not exist")
+
+    }
+
+    if(tweet.owner.toString() !== req.user._id.toString()){
+        throw new ApiError(404,"invalid tweet id")
+    }
+
+    const deletedTweet = await Tweet.findByIdAndDelete(tweetId)
+
+    return res
+        .status(200)
+        .json(new ApiResponse(200,tweet,"successfully deleted tweet"))
 
 })
 
 export {
     createTweet,
-    getUserTweets
+    getUserTweets,
+    updateTweet,
+    deletTweet,
 }
