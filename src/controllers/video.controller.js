@@ -93,7 +93,7 @@ const togglePublishVideo = asyncHandler(async (req,res)=>{
 
     const toggledVideo = await Video.findByIdAndUpdate(videoId,{
         isPublished:!video.isPublished
-    },{new:true})
+    },{returnDocument: 'after'})
 
     if(!toggledVideo){
         throw new ApiError(500,"not toggled your video visiblity")
@@ -132,9 +132,38 @@ const deletehVideo = asyncHandler(async (req,res)=>{
         .json(new ApiResponse(200,deletedVideo,"success"))
 })
 
+const updateVideo = asyncHandler(async (req,res)=>{
+    const { videoId } = req.body
+    if(!videoId){
+        throw new ApiError(404,"required video ID")
+    }
+
+    const video = await Video.findById(videoId)
+
+    if(!video){
+        throw new ApiError(404, "video not found")
+    }
+
+    const updateVideo = await Video.findByIdAndUpdate(video._id,{
+        title:req.body.videoTitle || video.title,
+        description:req.body.description || video.description,
+        isPublished:req.body.isPublished || video.isPublished
+    },
+    {returnDocument: 'after'})
+
+    if(!updateVideo){
+        throw new ApiError(500,"video not updated")
+    }
+
+    return res
+        .status(200)
+        .json(new ApiResponse(200,updateVideo,"success"))
+})
+
 export {
     addVideo,
     getVideo,
     togglePublishVideo,
     deletehVideo,
+    updateVideo,
 }

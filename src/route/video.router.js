@@ -3,7 +3,8 @@ import {
     addVideo,
     getVideo,
     togglePublishVideo,
-    deletehVideo
+    deletehVideo,
+    updateVideo
  } from "../controllers/video.controller.js"
 import { verifyJWT } from "../middleware/auth.middleware.js"
 import {upload} from "../middleware/multer.middleware.js"
@@ -20,5 +21,6 @@ router.route("/upload")
 router.route("/:videoId").get(getVideo)
 router.route("/toggle/publish/:videoId").patch(togglePublishVideo)
 router.route("/delete/:videoId").delete(deletehVideo)
+router.route("/update-video").patch(updateVideo)
 
 export default router

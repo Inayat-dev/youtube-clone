@@ -92,7 +92,7 @@ const updateTweet = asyncHandler(async (req,res)=>{
         throw new ApiError(404,"ID not match")
     }
 
-    const newTweet = await Tweet.findByIdAndUpdate(tweetId,{content},{new:true})
+    const newTweet = await Tweet.findByIdAndUpdate(tweetId,{content},{returnDocument: 'after'})
 
     if(!newTweet){
         throw new ApiError(500,"tweet not updated")
