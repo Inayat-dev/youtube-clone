@@ -19,13 +19,15 @@ import userRoute from "./route/user.router.js"
 import healthRoute from "./route/healthcheck.router.js"
 import tweetRouter from "./route/tweet.router.js"
 import subscriptionRouter from "./route/subscription.router.js"
-import commentRoute from "./route/comment.router.js"
+import commentRouter from "./route/comment.router.js"
+import videoRouter from "./route/video.router.js"
 
 //routes
 app.use("/users",userRoute)
 app.use("/healthcheck",healthRoute)
 app.use("/tweet",tweetRouter)
 app.use("/subscription",subscriptionRouter)
-app.use("/comment",commentRoute)
+app.use("/comment",commentRouter)
+app.use("/video",videoRouter)
 
 export default app
