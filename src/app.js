@@ -18,10 +18,12 @@ app.use(cookieParser())
 import userRoute from "./route/user.router.js"
 import healthRoute from "./route/healthcheck.router.js"
 import tweetRouter from "./route/tweet.router.js"
+import subscriptionRouter from "./route/subscription.router.js"
 
 //routes
 app.use("/users",userRoute)
 app.use("/healthcheck",healthRoute)
 app.use("/tweet",tweetRouter)
+app.use("/subscription",subscriptionRouter)
 
 export default app
