@@ -62,8 +62,6 @@ const getVideo = asyncHandler(async (req,res)=>{
         }
     ])
 
-    console.log(videoData[0].owner,req.user._id)
-
     if(!videoData[0].isPublished && videoData[0].owner.toString() !== req.user._id){
         return res
             .status(200)
