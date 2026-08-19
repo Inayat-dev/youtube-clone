@@ -104,8 +104,37 @@ const togglePublishVideo = asyncHandler(async (req,res)=>{
         .json(new ApiResponse(200,toggledVideo,"success"))
 })
 
+const deletehVideo = asyncHandler(async (req,res)=>{
+    const {videoId} = req.params
+    
+    if(!videoId){
+        throw new ApiError(404,"required video Id")
+    }
+
+    const video =  await Video.findById(videoId)
+
+    if(!video){
+        throw new ApiError(404,"video not found")
+    }
+
+    if(video.owner.toString() !== req.user._id){
+        throw new ApiError(404,"you are not auther")
+    }
+
+    const deletedVideo = await Video.findByIdAndDelete(videoId)
+
+    if(!deletedVideo){
+        throw new ApiError(500,"video not deleted")
+    }
+
+    return res  
+        .status(200)
+        .json(new ApiResponse(200,deletedVideo,"success"))
+})
+
 export {
     addVideo,
     getVideo,
-    togglePublishVideo
+    togglePublishVideo,
+    deletehVideo,
 }
