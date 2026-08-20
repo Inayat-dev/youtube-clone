@@ -85,7 +85,7 @@ const deleteComment = asyncHandler(async (req,res)=>{
 })
 
 const getComment = asyncHandler(async (req,res)=>{
-    const {limit=10, skip=0, sortBy="createdAt",sortType=1} = req.body;
+    const {limit=10, skip=0, sortBy="createdAt",sortType=1} = req.params;
 
     const comments = await Comment.aggregate([
         {
