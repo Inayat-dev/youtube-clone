@@ -9,7 +9,7 @@ const playlistSchema = new mongoose.Schema({
         type:String,
         required:true
     },
-    videoS:[{
+    videos:[{
         type:mongoose.Schema.Types.ObjectId,
         ref:"Video"
     }],
