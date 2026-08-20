@@ -62,15 +62,32 @@ const getVideo = asyncHandler(async (req,res)=>{
         }
     ])
 
+
+    if(!Boolean(videoData+videoData)){
+        throw new ApiError(404,"video did not found")
+    }
+
     if(!videoData[0].isPublished && videoData[0].owner.toString() !== req.user._id){
         return res
             .status(200)
             .json(new ApiResponse(200,{data:"video unavailable"},"success"))
     }
 
+    let watch = videoData[0]
+
+    if(req.user._id){
+        watch = await Video.findByIdAndUpdate(videoId,{
+                views:videoData[0].views + 1
+            },
+            {
+                returnDocument: 'after'
+            }
+        )
+    }
+
     return res
         .status(200)
-        .json(new ApiResponse(200,videoData,"success"))
+        .json(new ApiResponse(200,watch,"success"))
 })
 
 
@@ -160,10 +177,33 @@ const updateVideo = asyncHandler(async (req,res)=>{
         .json(new ApiResponse(200,updateVideo,"success"))
 })
 
+const getAllVideo = asyncHandler(async (req, res) => {
+    const { skip = 0, limit = 10, sortBy = "createdAt", sortType = -1 } = req.query
+
+    const videos = await Video.aggregate([
+        {
+            $sort: {
+                [sortBy]: Number(sortType)
+            }
+        },
+        {
+            $skip: Number(skip)
+        },
+        {
+            $limit: Number(limit)
+        }
+    ])
+
+    return res
+        .status(200)
+        .json(new ApiResponse(200, videos, "success"))
+})
+
 export {
     addVideo,
     getVideo,
     togglePublishVideo,
     deletehVideo,
     updateVideo,
+    getAllVideo,
 }
