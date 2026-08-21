@@ -55,7 +55,7 @@ const updateComment = asyncHandler(async (req,res)=>{
     }
 
     comment.content = content;
-    comment.save();
+    comment.save({ validateBeforeSave: false });
 
     return res
         .status(200)

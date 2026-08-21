@@ -200,7 +200,7 @@ const updateDetails = asyncHandler(async (req,res)=>{
         user.email = email
     }
 
-    user.save()
+    user.save({ validateBeforeSave: false })
 
     return res
             .status(200)
