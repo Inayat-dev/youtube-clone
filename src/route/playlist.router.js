@@ -21,7 +21,7 @@ router.route("/:playlistId")
     .patch(updatePlaylist)
     .get(getPlaylistById)
 
-router.route("/video")
+router.route("/:playlistId/:videoId")
     .post(addVideoToPlaylist)
     .delete(deleteVideoToPlaylist)
 

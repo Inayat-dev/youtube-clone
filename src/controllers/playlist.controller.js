@@ -40,51 +40,59 @@ const deletePlaylist = asyncHandler(async (req,res)=>{
         throw new ApiError(404,"you are not Authorized")
     }
 
-    await Playlist.findByIdAndDelete(req.user._id)
+    const deleted = await Playlist.findByIdAndDelete(playlistId)
+
+    if(!deleted){
+        throw new ApiError(500,"not deleted from ")
+    }
 
     return res  
-        .statsu(200)
+        .status(200)
         .json(new ApiResponse(200,{},"successflully deleted"))
 
 })
 
-const updatePlaylist = asyncHandler(async (req,res)=>{
-    const {playlistId = undefined, newName = undefined, newDescription = undefined} = req.body;
+const updatePlaylist = asyncHandler(async (req, res) => {
+    const { playlistId } = req.params;
+    const { newName, newDescription } = req.body;
 
-    if(!playlistId){
-        throw new ApiError(404,"invalid playlist")
+    if (!playlistId || !mongoose.isValidObjectId(playlistId)) {
+        throw new ApiError(400, "invalid playlist id");
     }
 
-    const playlist = await Playlist.findById(playlistId)
-
-    if(!playlist){
-        throw new ApiError(404,"playlist not found")
+    if (newName === undefined && newDescription === undefined) {
+        throw new ApiError(400, "nothing to update");
     }
 
-    if(playlist.owner.toString() != req.user._id.toString()){
-        throw new ApiError(404,"you are not Authorized")
+    const playlist = await Playlist.findById(playlistId);
+
+    if (!playlist) {
+        throw new ApiError(404, "playlist not found");
     }
 
-    playlist.name = newName || playlist.name
-    playlist.description = newDescription || playlist.description
+    if (playlist.owner.toString() !== req.user._id.toString()) {
+        throw new ApiError(403, "you are not authorized");
+    }
 
-    playlist.save({ validateBeforeSave: false });
+    if (newName !== undefined) playlist.name = newName;
+    if (newDescription !== undefined) playlist.description = newDescription;
 
-    return res  
-        .statsu(200)
-        .json(new ApiResponse(200,{playlist},"successflully updated"))
+    await playlist.save();
 
-})
+    return res
+        .status(200)
+        .json(new ApiResponse(200, { playlist }, "successfully updated"));
+});
 
 const getPlaylistByUserId = asyncHandler(async (req,res)=>{
     const {userId} = req.params
     if(!userId){
         throw new ApiError(404,"user not found")
     }
-    const playlists = Playlist.aggregate([
+    const playlists = await Playlist.aggregate([
         {
             $match:{
-                owner:mongoose.Types.ObjectId(userId)
+                owner: new mongoose.Types.ObjectId(userId)
             }
         }
     ])
@@ -100,7 +108,7 @@ const getPlaylistById = asyncHandler(async(req,res)=>{
     if(!playlistId){
         throw new ApiError(404,"user not found")
     }
-    const playlist = Playlist.aggregate([
+    const playlist = await Playlist.aggregate([
         {
             $match:{
                 _id: new mongoose.Types.ObjectId(playlistId)
@@ -115,7 +123,7 @@ const getPlaylistById = asyncHandler(async(req,res)=>{
 })
 
 const addVideoToPlaylist = asyncHandler(async (req,res)=>{
-    const {videoId, playlistId} = req.body
+    const {videoId, playlistId} = req.params
 
     if(!videoId || !playlistId){
         throw new ApiError(404,"please fill requirement")
@@ -129,7 +137,7 @@ const addVideoToPlaylist = asyncHandler(async (req,res)=>{
 
     const playlist = await Playlist.findById(playlistId)
 
-    const newPlaylist = Playlist.findByIdAndUpdate(playlistId,{
+    const newPlaylist = await Playlist.findByIdAndUpdate(playlistId,{
         $push:{
             videos:videoId
         }
@@ -142,7 +150,7 @@ const addVideoToPlaylist = asyncHandler(async (req,res)=>{
 })
 
 const deleteVideoToPlaylist = asyncHandler(async (req,res)=>{
-    const {videoId, playlistId} = req.body
+    const {videoId, playlistId} = req.params
 
     if(!videoId || !playlistId){
         throw new ApiError(404,"please fill requirement")
@@ -156,7 +164,7 @@ const deleteVideoToPlaylist = asyncHandler(async (req,res)=>{
 
     const playlist = await Playlist.findById(playlistId)
 
-    const newPlaylist = Playlist.findByIdAndUpdate(playlistId,{
+    const newPlaylist = await Playlist.findByIdAndUpdate(playlistId,{
         $pull:{
             videos:videoId
         }

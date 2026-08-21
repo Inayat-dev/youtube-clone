@@ -30,5 +30,6 @@ app.use("/tweet",tweetRouter)
 app.use("/subscription",subscriptionRouter)
 app.use("/comment",commentRouter)
 app.use("/video",videoRouter)
+app.use("/playlist",playlistRouter)
 
 export default app
