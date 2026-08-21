@@ -24,7 +24,7 @@ const createPlaylist = asyncHandler(async (req,res)=>{
 })
 
 const deletePlaylist = asyncHandler(async (req,res)=>{
-    const {playlistId} = req.body;
+    const {playlistId} = req.params;
 
     if(!playlistId){
         throw new ApiError(404,"invalid playlist")
@@ -49,7 +49,7 @@ const deletePlaylist = asyncHandler(async (req,res)=>{
 })
 
 const updatePlaylist = asyncHandler(async (req,res)=>{
-    const {playlistId, newName, newDescription} = req.query;
+    const {playlistId = undefined, newName = undefined, newDescription = undefined} = req.body;
 
     if(!playlistId){
         throw new ApiError(404,"invalid playlist")

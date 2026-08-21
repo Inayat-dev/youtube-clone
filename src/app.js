@@ -21,6 +21,7 @@ import tweetRouter from "./route/tweet.router.js"
 import subscriptionRouter from "./route/subscription.router.js"
 import commentRouter from "./route/comment.router.js"
 import videoRouter from "./route/video.router.js"
+import playlistRouter from "./route/playlist.router.js"
 
 //routes
 app.use("/users",userRoute)
