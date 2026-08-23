@@ -10,7 +10,9 @@ A REST API backend that replicates core YouTube functionality — user auth, vid
 - **Playlists** — Create, update, delete, add/remove videos, fetch by user or playlist ID
 - **Subscriptions** — Subscribe/unsubscribe toggle, list subscribers, list subscribed channels
 - **Comments** — Add, update, delete, fetch comments on a video
+- **Likes** — Add, update, delete, fetch likes of Video, Tweet, and comment
 - **Tweets** — Community-style short posts: create, update, delete, search
+- **Dashboard** — Fetch information like Total Videos, Total Video likes, Total Views, Total Subscribers 
 - **Healthcheck** — Simple endpoint to verify the API is alive
 
 ## Tech Stack
