@@ -3,6 +3,7 @@ import asyncHandler from "../utils/asyncHandler.js"
 import ApiError from "../utils/ApiError.js"
 import ApiResponse from "../utils/ApiResponse.js"
 import {uploadFileOnCloudinary} from "../utils/cloudinary.js"
+import { Like } from "../models/like.model.js"
 import mongoose from "mongoose"
 
 const addVideo = asyncHandler(async (req,res)=>{
@@ -62,7 +63,22 @@ const getVideo = asyncHandler(async (req,res)=>{
         }
     ])
 
+    const videoLikes = await Like.aggregate([
+        {
+            $match:{
+                video:new mongoose.Types.ObjectId(videoId)
+            }
+        },
+        {
+            $count:"likes"
+        }
+    ])
 
+    if(videoLikes == []){
+        throw new ApiError(500,"video not found")
+    }
+    
+      
     if(!Boolean(videoData+videoData)){
         throw new ApiError(404,"video did not found")
     }
@@ -87,7 +103,7 @@ const getVideo = asyncHandler(async (req,res)=>{
 
     return res
         .status(200)
-        .json(new ApiResponse(200,watch,"success"))
+        .json(new ApiResponse(200,{watch,'likes':videoLikes[0].likes},"success"))
 })
 
 

@@ -37,7 +37,7 @@ const toggleVideoLike = asyncHandler(async (req, res) => {
 const toggleCommentLike = asyncHandler(async (req, res) => {
     const { commentId } = req.params;
 
-    if (!isValidObjectId(videoId)) {
+    if (!isValidObjectId(commentId)) {
         throw new ApiError(400, "Invalid video id"); 
     }
 
@@ -66,7 +66,7 @@ const toggleCommentLike = asyncHandler(async (req, res) => {
 const toggleTweetLike = asyncHandler(async (req, res) => {
     const { tweetId } = req.params;
 
-    if (!isValidObjectId(videoId)) {
+    if (!isValidObjectId(tweetId)) {
         throw new ApiError(400, "Invalid video id"); 
     }
 
@@ -101,7 +101,7 @@ const getVideoLikeById = asyncHandler(async (req,res)=>{
     const videoLikes = await Like.aggregate([
         {
             $match:{
-                video:videoId
+                video: new mongoose.Types.ObjectId(videoId)
             }
         },
         {
@@ -109,15 +109,14 @@ const getVideoLikeById = asyncHandler(async (req,res)=>{
         }
     ])
 
-    if(videoLikes == []){
-        throw new ApiError(500,"video not found")
-    }
-
     return res
         .status(200)
-        .json(new ApiResponse(200,videoLikes,"success"))
+        .json(new ApiResponse(200,videoLikes[0],"success"))
 })
 
 export {
-    toggleVideoLike
+    toggleVideoLike,
+    toggleCommentLike,
+    toggleTweetLike,
+    getVideoLikeById
 }

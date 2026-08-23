@@ -22,11 +22,13 @@ import subscriptionRouter from "./route/subscription.router.js"
 import commentRouter from "./route/comment.router.js"
 import videoRouter from "./route/video.router.js"
 import playlistRouter from "./route/playlist.router.js"
+import likeRouter from "./route/like.router.js"
 
 //routes
 app.use("/users",userRoute)
 app.use("/healthcheck",healthRoute)
 app.use("/tweet",tweetRouter)
+app.use("/like",likeRouter)
 app.use("/subscription",subscriptionRouter)
 app.use("/comment",commentRouter)
 app.use("/video",videoRouter)
