@@ -23,6 +23,7 @@ import commentRouter from "./route/comment.router.js"
 import videoRouter from "./route/video.router.js"
 import playlistRouter from "./route/playlist.router.js"
 import likeRouter from "./route/like.router.js"
+import dashboardRouter from "./route/dashboard.router.js"
 
 //routes
 app.use("/users",userRoute)
@@ -33,5 +34,6 @@ app.use("/subscription",subscriptionRouter)
 app.use("/comment",commentRouter)
 app.use("/video",videoRouter)
 app.use("/playlist",playlistRouter)
+app.use("/dashboard",dashboardRouter)
 
 export default app
