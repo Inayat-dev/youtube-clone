@@ -112,6 +112,19 @@ const loginUser = asyncHandler(async function (req,res){
     .json(new ApiResponse(201,LoggedinUser,"User Loggedin Successfully"))
 })
 
+const me = asyncHandler(async function(req,res){
+    if(!req.user._id){
+        throw new ApiError(404,"required credential")
+    }
+    const data = await User.findById(req.user._id).select("-password -refreshToken")
+    if(!data){
+        throw new ApiError(404,"please login")
+    }
+    return res
+        .status(200)
+        .json(new ApiResponse(200,data,"success"))
+})
+
 const logoutUser = asyncHandler(async function(req,res){
     const user = req.user
 
@@ -362,6 +375,7 @@ export {
     registerUser, 
     loginUser, 
     logoutUser, 
+    me,
     AccessRefreshToken,
     updatePassword,
     updateDetails,

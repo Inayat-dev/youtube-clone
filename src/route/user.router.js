@@ -3,6 +3,7 @@ import {
     registerUser,
     loginUser, 
     logoutUser, 
+    me,
     AccessRefreshToken, 
     updatePassword, 
     updateDetails, 
@@ -27,6 +28,8 @@ router.route("/register").post(upload.fields([
 router.route("/login").post(loginUser)
 
 router.route("/logout").post(verifyJWT, logoutUser)
+
+router.route("/me").get(verifyJWT,me)
 
 router.route("/refresh-token").post(AccessRefreshToken)
 

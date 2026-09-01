@@ -60,6 +60,14 @@ const getVideo = asyncHandler(async (req,res)=>{
             $match:{
                 _id:new mongoose.Types.ObjectId(videoId)
             }
+        },
+        {
+            $lookup:{
+                from:"users",
+                localField:"owner",
+                foreignField:"_id",
+                as:"owner"
+            }
         }
     ])
 
@@ -207,6 +215,14 @@ const getAllVideo = asyncHandler(async (req, res) => {
         },
         {
             $limit: Number(limit)
+        },
+        {
+            $lookup:{
+                from:"users",
+                localField:"owner",
+                foreignField:"_id",
+                as:"owner"
+            }
         }
     ])
 

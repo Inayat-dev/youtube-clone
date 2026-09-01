@@ -1,12 +1,13 @@
 import express from "express";
 import cors from "cors"
 import cookieParser from "cookie-parser";
+import ApiError from "./utils/ApiError.js";
 
 
 const app = express()
 
 app.use(cors({
-    origin:process.env.ORIGIN,
+    origin:'http://localhost:5173',
     credentials: true
 }))
 app.use(express.json({limit:"16kb"}))
@@ -35,5 +36,25 @@ app.use("/comment",commentRouter)
 app.use("/video",videoRouter)
 app.use("/playlist",playlistRouter)
 app.use("/dashboard",dashboardRouter)
+
+app.use((err, req, res, next) => {
+    let error = err
+
+    // agar error ApiError instance nahi hai (jaise Mongoose/JWT ka error), to convert karo
+    if (!(error instanceof ApiError)) {
+        const statusCode = error.statusCode || 500
+        const message = error.message || "Something went wrong"
+        error = new ApiError(statusCode, message, error?.errors || [], err.stack)
+    }
+
+    const response = {
+        success: false,
+        message: error.message,
+        errors: error.errors,
+        ...(process.env.NODE_ENV === "development" ? { stack: error.stack } : {})
+    }
+
+    return res.status(error.statusCode).json(response)
+})
 
 export default app
