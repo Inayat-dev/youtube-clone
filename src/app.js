@@ -7,7 +7,7 @@ import ApiError from "./utils/ApiError.js";
 const app = express()
 
 app.use(cors({
-    origin:'http://localhost:5173',
+    origin:['http://localhost:5173', 'https://youtube-clone---frontend.pages.dev'],
     credentials: true
 }))
 app.use(express.json({limit:"16kb"}))

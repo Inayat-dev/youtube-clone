@@ -57,7 +57,7 @@ const getVideo = asyncHandler(async (req,res)=>{
 
     const videoData = await Video.aggregate([
         {
-            $match:{
+            $match: {
                 _id:new mongoose.Types.ObjectId(videoId)
             }
         },
