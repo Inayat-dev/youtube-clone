@@ -52,24 +52,35 @@ const addVideo = asyncHandler(async (req,res)=>{
 
 })
 
-const getVideo = asyncHandler(async (req,res)=>{
-    const {videoId} = req.params
+const getVideo = asyncHandler(async (req, res) => {
+    const { videoId } = req.params;
+
+    if (!mongoose.Types.ObjectId.isValid(videoId)) {
+        throw new ApiError(400, "Invalid video id");
+    }
 
     const videoData = await Video.aggregate([
         {
             $match: {
-                _id:new mongoose.Types.ObjectId(videoId)
+                _id: new mongoose.Types.ObjectId(videoId)
             }
         },
         {
-            $lookup:{
-                from:"users",
-                localField:"owner",
-                foreignField:"_id",
-                as:"owner"
+            $lookup: {
+                from: "users",
+                localField: "owner",
+                foreignField: "_id",
+                as: "owner"
             }
+        },
+        {
+            $unwind: "$owner" // owner becomes a single object, not an array
         }
-    ])
+    ]);
+
+    if (!videoData?.length) {
+        throw new ApiError(404, "Video not found");
+    }
 
     const existingLike = await Like.findOne({
         video: videoId,
@@ -78,42 +89,33 @@ const getVideo = asyncHandler(async (req,res)=>{
 
     const videoLikes = await Like.aggregate([
         {
-            $match:{
-                video:new mongoose.Types.ObjectId(videoId)
+            $match: {
+                video: new mongoose.Types.ObjectId(videoId)
             }
         },
         {
-            $count:"likes"
-        }  
-    ])
+            $count: "likes"
+        }
+    ]);
 
-    if(videoLikes == []){
-        throw new ApiError(500,"video not found")
-    }
-    
-      
-    if(!Boolean(videoData+videoData)){
-        throw new ApiError(404,"video did not found")
-    }
+    let watch = videoData[0];
 
-    
-
-    let watch = videoData[0]
-
-    if(req.user._id){
-        watch = await Video.findByIdAndUpdate(videoId,{
-                views:videoData[0].views + 1
-            },
-            {
-                returnDocument: 'after'
-            }
-        )
+    // increment views atomically, without losing the aggregated owner data
+    if (req.user?._id) {
+        await Video.findByIdAndUpdate(videoId, { $inc: { views: 1 } });
+        watch.views += 1;
     }
 
     return res
         .status(200)
-        .json(new ApiResponse(200,{watch,'likes':videoLikes[0]?.likes,existingLike},"success"))
-})
+        .json(
+            new ApiResponse(
+                200,
+                { watch, likes: videoLikes[0]?.likes || 0, existingLike },
+                "success"
+            )
+        );
+});
 
 
 const togglePublishVideo = asyncHandler(async (req,res)=>{
