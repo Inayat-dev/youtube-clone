@@ -71,6 +71,11 @@ const getVideo = asyncHandler(async (req,res)=>{
         }
     ])
 
+    const existingLike = await Like.findOne({
+        video: videoId,
+        likedBy: req.user?._id,
+    });
+
     const videoLikes = await Like.aggregate([
         {
             $match:{
@@ -107,7 +112,7 @@ const getVideo = asyncHandler(async (req,res)=>{
 
     return res
         .status(200)
-        .json(new ApiResponse(200,{watch,'likes':videoLikes[0]?.likes},"success"))
+        .json(new ApiResponse(200,{watch,'likes':videoLikes[0]?.likes,existingLike},"success"))
 })
 
 
