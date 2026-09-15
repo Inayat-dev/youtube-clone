@@ -78,9 +78,6 @@ const getVideo = asyncHandler(async (req,res)=>{
             }
         },
         {
-            $count:"likes"
-        },
-        {
             $addFields: {
                 liked: {
                     $cond: {
