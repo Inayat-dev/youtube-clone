@@ -78,16 +78,8 @@ const getVideo = asyncHandler(async (req,res)=>{
             }
         },
         {
-            $addFields: {
-                liked: {
-                    $cond: {
-                        if: { $eq: ["$_id", new mongoose.Types.ObjectId(req.user._id)] },
-                        then: true,
-                        else: false
-                    }
-                }
-            }
-        }   
+            $count:"likes"
+        }  
     ])
 
     if(videoLikes == []){
