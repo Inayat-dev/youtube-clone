@@ -91,11 +91,7 @@ const getVideo = asyncHandler(async (req,res)=>{
         throw new ApiError(404,"video did not found")
     }
 
-    if(!videoData[0].isPublished && videoData[0].owner.toString() !== req.user._id){
-        return res
-            .status(200)
-            .json(new ApiResponse(200,{data:"video unavailable"},"success"))
-    }
+    
 
     let watch = videoData[0]
 
@@ -111,7 +107,7 @@ const getVideo = asyncHandler(async (req,res)=>{
 
     return res
         .status(200)
-        .json(new ApiResponse(200,{watch,'likes':videoLikes[0].likes},"success"))
+        .json(new ApiResponse(200,{watch,'likes':videoLikes[0]?.likes},"success"))
 })
 
 
