@@ -1,4 +1,5 @@
 import {Video} from "../models/video.model.js"
+import { User } from "../models/user.model.js"
 import asyncHandler from "../utils/asyncHandler.js"
 import ApiError from "../utils/ApiError.js"
 import ApiResponse from "../utils/ApiResponse.js"
@@ -54,6 +55,7 @@ const addVideo = asyncHandler(async (req,res)=>{
 
 const getVideo = asyncHandler(async (req, res) => {
     const { videoId } = req.params;
+    const user = await User.findById(req.user._id)
 
     if (!mongoose.Types.ObjectId.isValid(videoId)) {
         throw new ApiError(400, "Invalid video id");
@@ -100,9 +102,12 @@ const getVideo = asyncHandler(async (req, res) => {
 
     let watch = videoData[0];
 
+
+
     // increment views atomically, without losing the aggregated owner data
     if (req.user?._id) {
         await Video.findByIdAndUpdate(videoId, { $inc: { views: 1 } });
+        user.watchHistory.includes(watch._id)?"": await User.findByIdAndUpdate(req.user?._id,{$addToSet: { watchHistory: watch._id }})
         watch.views += 1;
     }
 
@@ -176,6 +181,40 @@ const deletehVideo = asyncHandler(async (req,res)=>{
         .json(new ApiResponse(200,deletedVideo,"success"))
 })
 
+const getVideoByLike = asyncHandler(async (req,res)=>{
+    const video = await Like.aggregate([
+        {
+            $match:{
+                likedBy: new mongoose.Types.ObjectId(req.user._id)
+            }
+        },
+        {
+            $lookup:{
+                from:"videos",
+                foreignField:"_id",
+                localField:"video",
+                as:"video",
+                pipeline:[
+                    {
+                        $lookup:{
+                            from:"users",
+                            foreignField:"_id",
+                            localField:"owner",
+                            as:"owner"
+                        }
+                    }
+                ]
+            }
+        },{
+            $unwind:"$video"
+        }
+    ])
+
+    return res
+        .status(200)
+        .json(new ApiResponse(200,video,"success"))
+})
+
 const updateVideo = asyncHandler(async (req,res)=>{
     const { videoId } = req.body
     if(!videoId){
@@ -241,4 +280,5 @@ export {
     deletehVideo,
     updateVideo,
     getAllVideo,
+    getVideoByLike
 }

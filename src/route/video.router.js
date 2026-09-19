@@ -5,6 +5,7 @@ import {
     togglePublishVideo,
     deletehVideo,
     updateVideo,
+    getVideoByLike,
     getAllVideo
 } from "../controllers/video.controller.js"
 import { verifyJWT } from "../middleware/auth.middleware.js"
@@ -24,5 +25,6 @@ router.route("/toggle/publish/:videoId").patch(togglePublishVideo)
 router.route("/delete/:videoId").delete(deletehVideo)
 router.route("/update-video").patch(updateVideo)
 router.route("/").get(getAllVideo)
+router.route("/likedvideos/video").get(getVideoByLike)
 
 export default router
