@@ -86,12 +86,29 @@ const deleteComment = asyncHandler(async (req,res)=>{
 })
 
 const getComment = asyncHandler(async (req,res)=>{
-    const {limit=10, skip=0, sortBy="createdAt",sortType=1,videoId} = req.params;
+    const {limit=10, skip=0, sortBy="createdAt",sortType=0,videoId} = req.params;
 
     const comments = await Comment.aggregate([
         {
             $match:{
                 video:new mongoose.Types.ObjectId(videoId)
+            }
+        },
+        {
+            $lookup:{
+                from:"users",
+                localField:"owner",
+                foreignField:"_id",
+                "pipeline": [
+                    {
+                        $project:{
+                            password:0,
+                            refreshToken:0,
+                            accessToken:0
+                        }
+                    }
+                ],
+                as:"owner"
             }
         },
         {
