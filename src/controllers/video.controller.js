@@ -215,6 +215,30 @@ const getVideoByLike = asyncHandler(async (req,res)=>{
         .json(new ApiResponse(200,video,"success"))
 })
 
+const getWatchedVideo = asyncHandler(async (req, res) => {
+    const user = await User.findById(req.user._id);
+
+    if (!user?.watchHistory?.length) {
+        return res.status(200).json(
+            new ApiResponse(200, { videos: [] }, "No watched videos")
+        );
+    }
+
+    const videos = await Video.find({
+        _id: { $in: user.watchHistory }
+    }).populate("owner", "fullName avatar username");
+
+    // Sort: most recently watched first
+    // (last item in watchHistory = most recent)
+    videos.sort((a, b) =>
+        user.watchHistory.indexOf(b._id) - user.watchHistory.indexOf(a._id)
+    );
+
+    return res.status(200).json(
+        new ApiResponse(200, { videos }, "success")
+    );
+});   
+
 const updateVideo = asyncHandler(async (req,res)=>{
     const { videoId } = req.body
     if(!videoId){
@@ -280,5 +304,6 @@ export {
     deletehVideo,
     updateVideo,
     getAllVideo,
-    getVideoByLike
+    getVideoByLike,
+    getWatchedVideo
 }
