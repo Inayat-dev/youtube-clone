@@ -11,7 +11,7 @@ const router = Router()
 
 router.use(verifyJWT)
 
-router.route("/").post(addComment).get(getComment)
+router.route("/:videoId").post(addComment).get(getComment)
 router.route("/update").patch(updateComment)
 router.route("/delete").delete(deleteComment)
 

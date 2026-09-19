@@ -4,6 +4,7 @@ import ApiResponse from "../utils/ApiResponse.js";
 import {Video} from "../models/video.model.js"
 import {User} from "../models/user.model.js"
 import {Comment} from "../models/comment.model.js"
+import mongoose from "mongoose";
 
 
 const addComment = asyncHandler(async (req, res) => {
@@ -85,9 +86,14 @@ const deleteComment = asyncHandler(async (req,res)=>{
 })
 
 const getComment = asyncHandler(async (req,res)=>{
-    const {limit=10, skip=0, sortBy="createdAt",sortType=1} = req.params;
+    const {limit=10, skip=0, sortBy="createdAt",sortType=1,videoId} = req.params;
 
     const comments = await Comment.aggregate([
+        {
+            $match:{
+                video:new mongoose.Types.ObjectId(videoId)
+            }
+        },
         {
             $sort:{
                 [sortBy]:Number(sortType)
