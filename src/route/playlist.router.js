@@ -25,6 +25,6 @@ router.route("/:playlistId/:videoId")
     .post(addVideoToPlaylist)
     .delete(deleteVideoToPlaylist)
 
-router.route("/user/:userId").get(getPlaylistByUserId)
+router.route("/user/").get(getPlaylistByUserId)
 
 export default router
