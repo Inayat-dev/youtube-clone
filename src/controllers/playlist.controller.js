@@ -86,7 +86,6 @@ const updatePlaylist = asyncHandler(async (req, res) => {
 
 const getPlaylistByUserId = asyncHandler(async (req,res)=>{
     const userId = req.user._id
-    console.log(userId)
     if(!userId){
         throw new ApiError(404,"user not found")
     }
