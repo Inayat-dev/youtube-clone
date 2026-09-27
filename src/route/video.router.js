@@ -7,7 +7,8 @@ import {
     updateVideo,
     getVideoByLike,
     getAllVideo,
-    getWatchedVideo
+    getWatchedVideo,
+    videoByChannel
 } from "../controllers/video.controller.js"
 import { verifyJWT } from "../middleware/auth.middleware.js"
 import {upload} from "../middleware/multer.middleware.js"
@@ -26,6 +27,7 @@ router.route("/toggle/publish/:videoId").patch(togglePublishVideo)
 router.route("/delete/:videoId").delete(deletehVideo)
 router.route("/update-video").patch(updateVideo)
 router.route("/").get(getAllVideo)
+router.route("/channel/:channel").get(videoByChannel)
 router.route("/history/video").get(getWatchedVideo)
 router.route("/likedvideos/video").get(getVideoByLike)
 

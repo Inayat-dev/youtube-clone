@@ -267,12 +267,12 @@ const getChannel = asyncHandler(async (req, res) => {
     const data = await User.aggregate([
         {
             $match: {
-                username
+                username:username
             }
         },
         {
             $lookup: {
-                from: "subscription",
+                from: "subscriptions",
                 localField: "_id",
                 foreignField: "channel",
                 as: "subscribers"
@@ -280,9 +280,9 @@ const getChannel = asyncHandler(async (req, res) => {
         },
         {
             $lookup: {
-                from: "subscription",
+                from: "subscriptions",
                 localField: "_id",
-                foreignField: "subscribers",
+                foreignField: "subscriber",
                 as: "subscribed"
             }
         },
@@ -292,7 +292,7 @@ const getChannel = asyncHandler(async (req, res) => {
                 channelsSubscribedToCount: { $size: "$subscribed" },
                 isSubscribed: {
                     $cond: {
-                        if: { $in: [req.user._id, "$subscribers.subscriber"] },
+                        if: { $in: [new mongoose.Types.ObjectId(req.user._id), "$subscribers.subscriber"] },
                         then: true,
                         else: false
                     }

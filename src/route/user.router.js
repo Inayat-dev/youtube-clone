@@ -33,7 +33,7 @@ router.route("/me").get(verifyJWT,me)
 
 router.route("/refresh-token").post(AccessRefreshToken)
 
-router.route("/channel/:username").post(verifyJWT, getChannel)
+router.route("/channel/c/:username").post(verifyJWT, getChannel)
 
 router.route("/update-password").post(verifyJWT, updatePassword)
 

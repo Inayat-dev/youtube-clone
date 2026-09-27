@@ -297,6 +297,22 @@ const getAllVideo = asyncHandler(async (req, res) => {
         .json(new ApiResponse(200, videos, "success"))
 })
 
+const videoByChannel = asyncHandler(async (req,res)=>{
+    const {channel} = req.params
+
+    const data = await Video.aggregate([
+        {
+            $match:{
+                "owner":new mongoose.Types.ObjectId(channel)
+            }
+        }
+    ])
+
+    return res.
+        status(200)
+        .json(new ApiResponse(200,data,'success'))
+})
+
 export {
     addVideo,
     getVideo,
@@ -305,5 +321,6 @@ export {
     updateVideo,
     getAllVideo,
     getVideoByLike,
-    getWatchedVideo
+    getWatchedVideo,
+    videoByChannel
 }
