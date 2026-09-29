@@ -3,6 +3,7 @@ import ApiError from "../utils/ApiError.js";
 import ApiResponse from "../utils/ApiResponse.js";
 import mongoose from "mongoose";
 import { Tweet } from "../models/tweet.model.js"
+import {Like} from "../models/like.model.js"
 import { User } from "../models/user.model.js";
 
 const createTweet = asyncHandler(async (req,res)=>{
@@ -33,7 +34,7 @@ const getUserTweets = asyncHandler(async (req,res)=>{
     //get tweets
     //send to user
 
-    const {username, limit, skip} = req.query;
+    const {username, limit = 10, skip = 0} = req.query;
     
     
     if(!username){
@@ -47,25 +48,39 @@ const getUserTweets = asyncHandler(async (req,res)=>{
     }
 
     const tweets = await Tweet.aggregate([
-        {
-            $match:{
-                "owner":user._id,
-            }
+    {
+        $match: { owner: new mongoose.Types.ObjectId(user._id) },
+    },
+    { $sort: { createdAt: -1 } },          // newest first
+    { $skip: parseInt(skip) },             // skip pehle
+    { $limit: parseInt(limit) },           // limit baad me
+    {
+        $lookup: {
+        from: "likes",
+        localField: "_id",
+        foreignField: "tweet",
+        as: "likes",
         },
-        {
-            $limit:parseInt(limit)
-        },{            
-            $skip:parseInt(skip)
+    },
+    {
+        $addFields: {
+        // agar viewer ka like bhi chahiye to req.user._id use karo
+        isLiked: {
+            $in: [new mongoose.Types.ObjectId(req.user?._id), "$likes.likedBy"],
         },
-        {
-            $project:{
-                content:1,
-                createdAt:1,
-                updatedAt:1
-            }
-        }
-    ])
-
+        likes: { $size: "$likes" },        // array ko count bana diya
+        },
+    },
+    {
+        $project: {
+        content: 1,
+        likes: 1,
+        isLiked: 1,
+        createdAt: 1,
+        updatedAt: 1,
+        },
+    },
+    ]);
     return res  
         .status(200)
         .json(new ApiResponse(200,tweets))

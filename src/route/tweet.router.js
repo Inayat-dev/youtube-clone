@@ -13,6 +13,6 @@ router.route("/").post(verifyJWT, createTweet)
 router.route("/search").get(getUserTweets)
 router.route("/update").post(verifyJWT, updateTweet)
 router.route("/delete").post(verifyJWT, deletTweet)
-
+ 
 
 export default router
