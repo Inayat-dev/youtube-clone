@@ -57,40 +57,47 @@ const getUserChannelSubscribers = asyncHandler(async (req, res) => {
     const subscribers = await Subscription.aggregate([
         {
             $match: {
-                "channel":new mongoose.Types.ObjectId(channelId)
+                channel: new mongoose.Types.ObjectId(channelId)
             }
         },
         {
-            $project:{
-                subscriber:1,
-                _id:0
-            }
+            $limit:20
         },
         {
-            $lookup:{
-                from:"users",
-                localField:"subscriber",
-                foreignField:"_id",
-                as:"user",
-                pipeline:[
+            $lookup: {
+                from: "users",
+                localField: "subscriber",
+                foreignField: "_id",
+                as: "user",
+                pipeline: [
                     {
-                        $project:{
-                            _id:0,
-                            username:1,
-                            avatar:1
+                        $lookup: {
+                            from: "subscriptions",      // lowercase + plural
+                            localField: "_id",
+                            foreignField: "channel",
+                            as: "subscriptions"
+                        }
+                    },
+                    {
+                        $addFields: {               
+                            subscriberCount: { $size: "$subscriptions" } ,
+                            isSubscribed:{$in:[new mongoose.Types.ObjectId(req.user._id), "$subscriptions.subscriber" ]},
+                            
+                        }
+                    },
+                    {
+                        $project: {
+                            username: 1,
+                            avatar: 1,
+                            subscriberCount: 1,
+                            isSubscribed:1
                         }
                     }
                 ]
-
-            }          
-
-        },
-        {
-            $addFields:{
-                "user": {$first:"$user"},
-                
             }
-        }
+        },
+        { $unwind: "$user" },
+        { $replaceRoot: { newRoot: "$user" } }
     ])
 
     return res

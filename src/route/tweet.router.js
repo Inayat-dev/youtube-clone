@@ -10,7 +10,7 @@ import { verifyJWT } from "../middleware/auth.middleware.js";
 const router = Router();
 
 router.route("/").post(verifyJWT, createTweet)
-router.route("/search").get(getUserTweets)
+router.route("/search").get(verifyJWT,getUserTweets)
 router.route("/update").post(verifyJWT, updateTweet)
 router.route("/delete").post(verifyJWT, deletTweet)
  
